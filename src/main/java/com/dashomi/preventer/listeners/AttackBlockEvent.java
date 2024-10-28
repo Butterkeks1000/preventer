@@ -3,17 +3,16 @@ package com.dashomi.preventer.listeners;
 import com.dashomi.preventer.PreventerClient;
 import net.minecraft.block.*;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.PickaxeItem;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.block.GlassBlock;
 
 import java.util.Objects;
 
@@ -21,7 +20,7 @@ import static com.dashomi.preventer.utils.DurabilityProtection.checkDurabilityPr
 
 public class AttackBlockEvent {
     public static ActionResult attackBlockListener(PlayerEntity playerEntity, World world, Hand hand, BlockPos pos, Direction direction) {
-        if (!PreventerClient.overrideKeyPressed) {
+        if (PreventerClient.getPrevent()) {
             Block targetBlock = world.getBlockState(pos).getBlock();
             if (PreventerClient.config.onlyMatureCropHarvest) {
                 if (targetBlock instanceof CropBlock) {
@@ -34,6 +33,14 @@ public class AttackBlockEvent {
                 }
                 if (targetBlock instanceof NetherWartBlock) {
                     if (world.getBlockState(pos).get(NetherWartBlock.AGE) < 3) {
+                        if (PreventerClient.config.onlyMatureCropHarvest_msg) {
+                            playerEntity.sendMessage(Text.translatable("config.preventer.onlyMatureCropHarvest.text"), true);
+                        }
+                        return ActionResult.FAIL;
+                    }
+                }
+                if (targetBlock instanceof CocoaBlock) {
+                    if (world.getBlockState(pos).get(CocoaBlock.AGE) < 2) {
                         if (PreventerClient.config.onlyMatureCropHarvest_msg) {
                             playerEntity.sendMessage(Text.translatable("config.preventer.onlyMatureCropHarvest.text"), true);
                         }
@@ -61,12 +68,14 @@ public class AttackBlockEvent {
             }
 
             if (PreventerClient.config.preventGlassBreaking) {
-                if (targetBlock instanceof GlassBlock || targetBlock instanceof StainedGlassBlock || targetBlock instanceof PaneBlock || targetBlock instanceof TintedGlassBlock) {
+                if (targetBlock instanceof TransparentBlock || targetBlock instanceof PaneBlock) {
                     if (!Objects.equals(targetBlock.getTranslationKey(), "block.minecraft.iron_bars")) {
-                        if (PreventerClient.config.preventGlassBreaking_msg) {
-                            playerEntity.sendMessage(Text.translatable("config.preventer.preventGlassBreaking.text"), true);
+                        if (!(targetBlock instanceof TintedGlassBlock)) {
+                            if (PreventerClient.config.preventGlassBreaking_msg) {
+                                playerEntity.sendMessage(Text.translatable("config.preventer.preventGlassBreaking.text"), true);
+                            }
+                            return ActionResult.FAIL;
                         }
-                        return ActionResult.FAIL;
                     }
                 }
             }
@@ -90,7 +99,7 @@ public class AttackBlockEvent {
             if (PreventerClient.config.preventEnderChestBreaking) {
                 if (targetBlock instanceof EnderChestBlock) {
                     if (playerEntity.getMainHandStack().getItem() instanceof PickaxeItem) {
-                        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, playerEntity.getMainHandStack()) == 0) {
+                        if (!EnchantmentHelper.hasAnyEnchantmentsIn(playerEntity.getMainHandStack(), EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING)) {
                             if (PreventerClient.config.preventEnderChestBreaking_msg) {
                                 playerEntity.sendMessage(Text.translatable("config.preventer.preventEnderChestBreaking.text"), true);
                             }
@@ -138,6 +147,37 @@ public class AttackBlockEvent {
                         playerEntity.sendMessage(Text.translatable("config.preventer.preventCarpetBreaking.text"), true);
                     }
                     return ActionResult.FAIL;
+                }
+            }
+
+            if (PreventerClient.config.preventSaplingBreaking) {
+                if (targetBlock instanceof SaplingBlock) {
+                    if (PreventerClient.config.preventSaplingBreaking_msg) {
+                        playerEntity.sendMessage(Text.translatable("config.preventer.preventSaplingBreaking.text"), true);
+                    }
+                    return ActionResult.FAIL;
+                }
+            }
+
+            if (PreventerClient.config.preventImmatureAmethystBreaking) {
+                if (targetBlock instanceof AmethystClusterBlock) {
+                    if (!targetBlock.getTranslationKey().equals("block.minecraft.amethyst_cluster")) {
+                        if (PreventerClient.config.preventImmatureAmethystBreaking_msg) {
+                            playerEntity.sendMessage(Text.translatable("config.preventer.preventImmatureAmethystBreaking.text"), true);
+                        }
+                        return ActionResult.FAIL;
+                    }
+                }
+            }
+
+            if (PreventerClient.config.requireFortuneIII) {
+                if (targetBlock instanceof OreBlock) {
+                    if (!EnchantmentHelper.getLevel(net.minecraft.enchantment.Enchantments.FORTUNE, playerEntity.getMainHandStack()) == 3) {
+                        if (PreventerClient.config.requireFortuneIII_msg) {
+                            playerEntity.sendMessage(Text.translatable("config.preventer.requireFortuneIII.text"), true);
+                        }
+                        return ActionResult.FAIL;
+                    }
                 }
             }
 
