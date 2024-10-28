@@ -13,6 +13,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.block.OreBlock;
+import net.minecraft.enchantment.Enchantments;
 
 import java.util.Objects;
 
@@ -172,7 +174,7 @@ public class AttackBlockEvent {
 
             if (PreventerClient.config.requireFortuneIII) {
                 if (targetBlock instanceof OreBlock) {
-                    if (!EnchantmentHelper.getLevel(net.minecraft.enchantment.Enchantments.FORTUNE, playerEntity.getMainHandStack()) == 3) {
+                    if (EnchantmentHelper.getLevel(Enchantments.FORTUNE, playerEntity.getMainHandStack()) != 3) {
                         if (PreventerClient.config.requireFortuneIII_msg) {
                             playerEntity.sendMessage(Text.translatable("config.preventer.requireFortuneIII.text"), true);
                         }
