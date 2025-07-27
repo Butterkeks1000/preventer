@@ -21,10 +21,12 @@ public class AttackBlockEvent {
     public static ActionResult attackBlockListener(PlayerEntity playerEntity, World world, Hand hand, BlockPos pos, Direction direction) {
         if (PreventerClient.getPrevent()) {
             Block targetBlock = world.getBlockState(pos).getBlock();
+            ItemStack mhs = playerEntity.getMainHandStack();
 
             if (PreventerClient.config.preventBreakingWithWeapon) {
                 Item item = playerEntity.getStackInHand(hand).getItem();
-                if (item instanceof SwordItem || item instanceof TridentItem || item instanceof MaceItem) {
+                if (mhs.isOf(Items.DIAMOND_SWORD) || mhs.isOf(Items.STONE_SWORD) || mhs.isOf(Items.GOLDEN_SWORD) || item instanceof TridentItem
+                        || item instanceof MaceItem || mhs.isOf(Items.IRON_SWORD) || mhs.isOf(Items.WOODEN_SWORD) || mhs.isOf(Items.NETHERITE_SWORD)) {
                     if (PreventerClient.config.preventBreakingWithWeapon_msg) {
                         playerEntity.sendMessage(Text.translatable("config.preventer.preventBreakingWithWeapon.text"), true);
                     }
@@ -108,7 +110,8 @@ public class AttackBlockEvent {
 
             if (PreventerClient.config.preventEnderChestBreaking) {
                 if (targetBlock instanceof EnderChestBlock) {
-                    if (playerEntity.getMainHandStack().getItem() instanceof PickaxeItem) {
+                    if (mhs.isOf(Items.DIAMOND_PICKAXE) || mhs.isOf(Items.NETHERITE_PICKAXE) || mhs.isOf(Items.IRON_PICKAXE)
+                            || mhs.isOf(Items.GOLDEN_PICKAXE) || mhs.isOf(Items.STONE_PICKAXE) || mhs.isOf(Items.WOODEN_PICKAXE)) {
                         if (!EnchantmentHelper.hasAnyEnchantmentsIn(playerEntity.getMainHandStack(), EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING)) {
                             if (PreventerClient.config.preventEnderChestBreaking_msg) {
                                 playerEntity.sendMessage(Text.translatable("config.preventer.preventEnderChestBreaking.text"), true);
