@@ -48,7 +48,7 @@ public class ClientPlayerEntityMixin {
     private void onTickMovement(CallbackInfo ci) {
         if (!PreventerClient.overrideKeyPressed) {
             ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-            World world = player.getWorld();
+            World world = player.getEntityWorld();
             BlockPos pos = player.getBlockPos();
 
 

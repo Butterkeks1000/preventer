@@ -169,7 +169,7 @@ public class UseBlockEvent {
             }
 
             if (PreventerClient.config.preventRocketUse && !playerEntity.isSpectator()) {
-                if (!playerEntity.isGliding() && handItem instanceof FireworkRocketItem && playerEntity.getWorld().isClient) {
+                if (!playerEntity.isGliding() && handItem instanceof FireworkRocketItem && playerEntity.getEntityWorld().isClient()) {
                     if (canNotInteractWithBlock(targetBlockState, playerEntity, hand, blockHitResult)) {
                         if (PreventerClient.config.rocketInOffhand && Hand.OFF_HAND == hand) {
                             if (PreventerClient.config.preventRocketUse_msg) {
@@ -353,7 +353,7 @@ public class UseBlockEvent {
                 block.isOf(Blocks.COMPARATOR)) {
             return false;
         }
-        ActionResult actionResult = block.onUse(playerEntity.getWorld(), playerEntity, blockHitResult);
+        ActionResult actionResult = block.onUse(playerEntity.getEntityWorld(), playerEntity, blockHitResult);
         return !actionResult.isAccepted();
     }
 
